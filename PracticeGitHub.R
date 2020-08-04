@@ -1,3 +1,6 @@
 #This is my new script
 
-jannine<-28
+
+
+jannine^2
+
