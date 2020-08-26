@@ -63,9 +63,24 @@ ui<-navbarPage("Intertidal temperature data along the Pacific Coast",
                
                # Methods page
                tabPanel("Methods", 
+                      tags$div(
                         h2("How is this data collected?"),
-                        p("Temperature data is collected using biomimetic temperature loggers called Robomussels. Robomussels are different from other temperature loggers because they thermally match living mussel, meaning they are similar in size, color, shape and thermal inertia. Using Robomussels allows us to more accurately measure temperature experienced by mussels." ),
-                        p("Multiple Robomussels are installed at each site, they are placed at different heights in the mussel bed to measure the wide range of temperatures experienced by mussels.")),
+                        p("Temperature data is collected using biomimetic temperature
+                          loggers called Robomussels. Robomussels are different from other 
+                          temperature loggers because they thermally match living mussels, 
+                          meaning they are similar in size, color, shape and thermal inertia. 
+                          Using Robomussels allows us to more accurately measure 
+                          temperature experienced by mussels.")),
+                      tags$img(src='robomussel.jpg', 
+                                 height=350, width="70%",
+                                 style="display: block; 
+                                    margin-left: auto; 
+                                    margin-right: auto;"), #this part of this centers the image
+                      tags$div(   
+                         p("Multiple Robomussels are installed at each site, 
+                           they are placed at different heights in the mussel bed 
+                           to measure the wide range of temperatures 
+                           experienced by mussels in the intertidal zone."))),
                
                # Single site page
                tabPanel("Explore a Site"),
