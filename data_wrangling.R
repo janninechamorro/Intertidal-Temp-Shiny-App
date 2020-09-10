@@ -4,14 +4,16 @@
 
 library(tidyverse)
 library(here)
+library(chron)
 library(lubridate)
+library(naniar)
 
 metadata<-read_csv(here::here("logger_data","logger_info2.csv"))
 
 import_temp_files<-function(file_name_csv, site, zone, loggerID){
-  read_csv(here:here("logger_data","robomussel_data", file_name_csv), col_names=TRUE, col_types=cols(.default=col_character())) %>% 
-    mutate(Time_GMT=as.POSIXct(Time_GMT, "%m/%d/%Y %H:%M:%S", tz="GMT"), local_datetime=with_tz(Time_GMT, tz="_Angeles"),
-           year=substr(local_datetime, 7,10), month=substr(local_datetime,1,2), day=substr(local_datetime,4,5),
+  read_csv(here::here("logger_data","robomussel_data", file_name_csv), col_names=TRUE, col_types=cols(.default=col_character())) %>% 
+    mutate(Time_GMT=mdy_hm(Time_GMT), local_datetime=with_tz(Time_GMT, tz="America/Los_Angeles"),
+           year=substr(local_datetime, 1,4), month=substr(local_datetime,6,7), day=substr(local_datetime,9,10),
            year=as.factor(year),
            month=as.factor(month),
            day=as.numeric(day),
