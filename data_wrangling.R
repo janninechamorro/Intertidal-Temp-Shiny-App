@@ -54,3 +54,4 @@ for(row in 1:nrow(metadata)){
    temp_data<-rbind(temp_data, table)
    }
 
+write.csv(temp_data, "temp_data.csv")
