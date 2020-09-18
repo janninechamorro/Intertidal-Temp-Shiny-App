@@ -126,8 +126,9 @@ ui<-navbarPage("Intertidal temperature data along the Pacific Coast",
                                        choices= c("High", "Mid", "Low")),
                                      dateRangeInput(
                                        inputId = "daterange",
-                                       label = "Date")
-                                     )),
+                                       label = "Date")), 
+                        mainPanel("Temperature Plot", plotOutput((outputId="temp_plot")))),
+                       
                         
                # Site comparisons page
                tabPanel("Compare Sites"))
@@ -193,6 +194,15 @@ server<-function(input, output) {
   })
   
  # Plotting Temperature Data 
+  output$temp_plot<-renderPlot({
+    ggplot(data=temp_data, aes(x=local_datetime, y=Temp_C, color=zone))+
+      geom_point(size=0.2, alpha=0.5)
+  })
+  
+  SiteID<-reactive({
+    temp_data %>% 
+      filter(site %in% input$site_ID)
+  })
   
 }
   
