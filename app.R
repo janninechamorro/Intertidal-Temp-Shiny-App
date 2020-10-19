@@ -11,7 +11,10 @@ library(leaflet)
 
 #############################################
 # Import location data
-all_sites <- read.csv("InfoMicrosite_2016_mussel.csv")
+
+setwd("~/Documents/GitHub/Intertidal-Temp-Shiny-App/")
+
+all_sites <- read.csv("~/Documents/GitHub~Intertidal-Temp-Shiny-App/InfoMicrosite_2016_mussel.csv")
 
 
 # Subset West Coast sites
