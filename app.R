@@ -47,7 +47,7 @@ ui<-navbarPage("Intertidal temperature data along the Pacific Coast",
                         
                         tags$div(
                           h4("This app allows you to visualize intertidal
-                            temperature data collected along the Pacific Coast.
+                            temperature data collected along the northeastern Pacific Coast.
                             Explore the app using the navigation bar above."),
                           h1(),
                           h3("Check out our collaborators:"),
@@ -87,7 +87,11 @@ ui<-navbarPage("Intertidal temperature data along the Pacific Coast",
                           temperature loggers because they thermally match living mussels, 
                           meaning they are similar in size, color, shape and thermal inertia. 
                           Using Robomussels allows us to more accurately measure 
-                          temperature experienced by mussels. Multiple Robomussels are installed at each site, 
+                          temperature experienced by mussels. Robomussels specifically used in 
+                          this dataset were designed to mimic once of the most abundant mussel
+                          species found along the northeastern Pacific coast, California mussels",
+                        em("(Mytilus californianus)."),
+                          "Multiple Robomussels are installed at each site, 
                            they are placed at different heights in the mussel bed 
                           to measure the wide range of temperatures 
                           experienced by mussels in the intertidal zone.")),
@@ -116,22 +120,34 @@ ui<-navbarPage("Intertidal temperature data along the Pacific Coast",
                # I made replicate single site page to try an figure out how to plot the temp data. 
                # Once I figure it out we can combine it with the original page.
                tabPanel("Explore a Site",
-                        sidebarPanel(selectInput(
-                                        inputId = "site_ID",
-                                        label="Choose a Site", 
-                                        choices=sort(unique(temp_data$site))),
-                                     checkboxGroupInput(
-                                       inputId = "zone_ID",
-                                       label= "Zone",
-                                       choices= c("High", "Mid", "Low")),
-                                     dateRangeInput(
-                                       inputId = "daterange",
-                                       label = "Date")), 
-                        mainPanel("Temperature Plot", plotOutput((outputId="temp_plot")))),
-                       
+                        sidebarPanel(
+                                      # Select which Site to plot
+                                      selectInput(
+                                            inputId = "SiteFinder",
+                                            label="Choose a Site", 
+                                            choices=c("Lompoc Landing, CA"="LL", "Alegria, CA"="AG", "Coal Oil Point, CA"="CP")),
+                                     
+                                      # Select which Zone(s) to plot
+                                      checkboxGroupInput(
+                                            inputId = "ZoneFinder",
+                                            label= "Zone",
+                                            choices= c("High", "Upper-Mid", "Mid", "Lower-Mid", "Low")),
+                                     
+                                      # Select which Date Range to Plot
+                                      sliderInput(
+                                            inputId = "dateFinder",
+                                            label = "Date",
+                                            value= c(as.Date(min(temp_data$date)), as.Date(max(temp_data$date))),
+                                            min= as.Date(min(temp_data$date)),
+                                            max= as.Date(max(temp_data$date)),
+                                            timeFormat="%b %Y")), 
+                       #Here is some text to determine if my stuff is getting pushed
                         
-               # Site comparisons page
-               tabPanel("Compare Sites"))
+                              mainPanel("", 
+                                    plotOutput((outputId="scatterplotFinder")))))
+                       
+                         
+        
 
 
 #############################################
@@ -139,7 +155,7 @@ server<-function(input, output) {
   
   # Create welcome page photo slideshow
   output$welcome_slideshow <- renderSlickR({
-    images <- c("IMG_2186.jpg", "IMG_2275.jpg", "IMG_5476.jpg", "Panorama12.jpg", 
+    images <- c( "IMG_2275.jpg", "IMG_5476.jpg", "Panorama12.jpg", 
                 "IMG_6126.jpg")
     slickR(
       images,
@@ -192,17 +208,28 @@ server<-function(input, output) {
       icon="fa-globe", title="Zoom out to level 1",
       onClick=JS("function(btn, map){ map.setZoom(1); }")))
   })
+
+### Explore a Site Page
+      
+    #Filtering Data to Plot
+            Intertidal_Finder<-reactive({
+                   temp_data %>% 
+                        filter(site==input$SiteFinder) %>% #Filter out site of interest
+                         filter(zone==input$ZoneFinder) %>% #Filter out zone (s) of interest
+                          subset(date >= input$dateFinder[1] & date <= input$dateFinder[2])
+})
+
   
- # Plotting Temperature Data 
-  output$temp_plot<-renderPlot({
-    ggplot(data=temp_data, aes(x=local_datetime, y=Temp_C, color=zone))+
-      geom_point(size=0.2, alpha=0.5)
-  })
+      #Plotting Temperature Data 
+              output$scatterplotFinder<- renderPlot({
+              ggplot(data=Intertidal_Finder(), aes(x=local_datetime, y=Temp_C, color=zone))+
+              geom_point(size=0.2, alpha=0.5)+
+                  xlab("Date")+
+                  ylab("Temperature (C)")+
+                  theme_minimal(base_size=20)
+})
   
-  SiteID<-reactive({
-    temp_data %>% 
-      filter(site %in% input$site_ID)
-  })
+
   
 }
   
