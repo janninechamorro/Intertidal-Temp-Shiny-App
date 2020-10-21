@@ -101,8 +101,13 @@ ui<-navbarPage("Intertidal temperature data along the Pacific Coast",
                                  height=350, width="70%",
                                  style="display: block; 
                                     margin-left: auto; 
-                                    margin-right: auto;")), #this part of this centers the image
-
+                                    margin-right: auto;"), #this part of this centers the image
+                      tags$img(src='robomussel_3.jpg', 
+                                 height=350, width="70%",
+                                 style="display: block; 
+                                    margin-left: auto; 
+                                    margin-right: auto;")),
+                              
                
                # Single site page
                tabPanel("Explore a Site",
@@ -134,7 +139,7 @@ ui<-navbarPage("Intertidal temperature data along the Pacific Coast",
                                             inputId = "ZoneFinder",
                                             label= "Zone",
                                             choices= c("High", "Mid", "Low")),
-                                     
+                                            
                                       # Select which Date Range to Plot
                                       sliderInput(
                                             inputId = "dateFinder",
@@ -146,7 +151,7 @@ ui<-navbarPage("Intertidal temperature data along the Pacific Coast",
                        #Here is some text to determine if my stuff is getting pushed
                        #here is a change 2
                         
-                              mainPanel("Temperature Plot", 
+                              mainPanel("", 
                                    withSpinner(plotOutput(outputId="scatterplotFinder"), color="#DCE2E3"))))
                        
                          
@@ -216,22 +221,26 @@ server<-function(input, output) {
       
     #Filtering Data to Plot
             Intertidal_Finder<-reactive({
-                   temp_data %>% 
+              validate(need(input$ZoneFinder, "Please select from the dataset."))
+              
+              temp_data %>% 
                         filter(site==input$SiteFinder) %>% #Filter out site of interest
                          filter(zone==input$ZoneFinder) %>% #Filter out zone (s) of interest
-                          subset(date >= input$dateFinder[1] & date <= input$dateFinder[2])
+                          subset(date >= input$dateFinder[1] & date <= input$dateFinder[2])#Filters based on dates
 })
 
   
       #Plotting Temperature Data 
           
               output$scatterplotFinder<- renderPlot({
+              
               ggplot(data=Intertidal_Finder(), aes(x=local_datetime, y=Temp_C, color=zone))+
               geom_point(size=0.2, alpha=0.5)+
                   xlab("Date")+
                   ylab("Temperature (C)")+
                   labs(color="Zone")+
                   theme_minimal(base_size=20)
+                
 })
   
 
