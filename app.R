@@ -107,7 +107,7 @@ ui<-navbarPage("Intertidal temperature data along the Pacific Coast",
                                  style="display: block; 
                                     margin-left: auto; 
                                     margin-right: auto;")),
-                              
+                        #some notes to check it is loading to git hub      
                
                # Single site page
                tabPanel("Explore a Site",
