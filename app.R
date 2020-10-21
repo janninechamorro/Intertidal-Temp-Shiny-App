@@ -8,6 +8,8 @@ library(ggplot2)
 library(slickR)
 library(here)
 library(leaflet)
+library(shinycssloaders)
+
 
 #############################################
 # Import location data
@@ -26,7 +28,7 @@ site_data = filter(all_sites,
 unique_site_data <- distinct(site_data, location, .keep_all = TRUE)
 
 # All temp data from "data_wrangling.R"
-temp_data<-read_csv(file="temp_data.csv")
+#temp_data<-read_csv(file="temp_data.csv")
 
 #############################################
 ui<-navbarPage("Intertidal temperature data along the Pacific Coast",
@@ -137,7 +139,7 @@ ui<-navbarPage("Intertidal temperature data along the Pacific Coast",
                                       checkboxGroupInput(
                                             inputId = "ZoneFinder",
                                             label= "Zone",
-                                            choices= c("High", "Upper-Mid", "Mid", "Lower-Mid", "Low")),
+                                            choices= c("High", "Mid", "Low")),
                                      
                                       # Select which Date Range to Plot
                                       sliderInput(
@@ -148,9 +150,10 @@ ui<-navbarPage("Intertidal temperature data along the Pacific Coast",
                                             max= as.Date(max(temp_data$local_datetime), format="%Y-%m-%d %h:%m:%s"),
                                             timeFormat="%b %Y")), 
                        #Here is some text to determine if my stuff is getting pushed
+                       #here is a change 2
                         
-                              mainPanel("", 
-                                    plotOutput((outputId="scatterplotFinder")))))
+                              mainPanel("Temperature Plot", 
+                                   withSpinner(plotOutput(outputId="scatterplotFinder"), color="#DCE2E3"))))
                        
                          
         
@@ -298,11 +301,13 @@ server<-function(input, output, session) {
 
   
       #Plotting Temperature Data 
+          
               output$scatterplotFinder<- renderPlot({
               ggplot(data=Intertidal_Finder(), aes(x=local_datetime, y=Temp_C, color=zone))+
               geom_point(size=0.2, alpha=0.5)+
                   xlab("Date")+
                   ylab("Temperature (C)")+
+                  labs(color="Zone")+
                   theme_minimal(base_size=20)
 })
   
