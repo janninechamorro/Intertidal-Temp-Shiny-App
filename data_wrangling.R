@@ -8,17 +8,20 @@ library(chron)
 library(lubridate)
 library(naniar)
 
-metadata<-read_csv(here::here("logger_data","logger_info2.csv"))
+metadata<-read_csv(file="logger_info4.csv")
 
+#Function to import all files at once, organize date using "logger_info2.csv"
 import_temp_files<-function(file_name_csv, site, zone, loggerID){
-  read_csv(here::here("logger_data","robomussel_data", file_name_csv), col_names=TRUE, col_types=cols(.default=col_character())) %>% 
+  read_csv(here::here("robo_updated","logger_data_csv", file_name_csv), col_names=TRUE, col_types=cols(.default=col_character())) %>% 
     mutate(Time_GMT=mdy_hm(Time_GMT), local_datetime=with_tz(Time_GMT, tz="America/Los_Angeles"),
-           year=substr(local_datetime, 1,4), month=substr(local_datetime,6,7), day=substr(local_datetime,9,10)) %>% 
+           date=substr(local_datetime, 1,10), year=substr(local_datetime, 1,4), month=substr(local_datetime,6,7), day=substr(local_datetime,9,10)) %>% 
     mutate(Time_GMT=as.POSIXct(Time_GMT, "%m/%d/%Y %H:%M:%S", tz="GMT"), 
            local_datetime=with_tz(Time_GMT, tz="America/Los_Angeles"),
+           date=substr(local_datetime, 1,10),
            year=substr(local_datetime, 1,4), 
-           month=substr(local_datetime,6,7), 
-           day=substr(local_datetime,9,10),
+           month=substr(local_datetime, 6,7), 
+           day=substr(local_datetime, 9,10),
+           date=as.Date(date),
            year=as.factor(year),
            month=as.factor(month),
            day=as.numeric(day),
@@ -30,16 +33,16 @@ import_temp_files<-function(file_name_csv, site, zone, loggerID){
 #initialize empty df to fill with cleaned data
 
 temp_data<-data.frame(local_datetime=as.Date(character()),
+                      date=as.Date(character()),
                       year=factor(),
                       month=factor(),
                       day=numeric(),
-                      site=as.character(),
-                      zone=as.character(),
+                      site=factor(),
+                      zone=factor(),
                       loggerID=as.character(),
                       Temp_C=numeric())
 
 #for loop reads in/wrangles all files using the import_temp_files() function above
-
 for(row in 1:nrow(metadata)){
   data_row<-metadata[row,]
   file_name_csv<-as.character(data_row[,1])
@@ -52,6 +55,8 @@ for(row in 1:nrow(metadata)){
   print(loggerID)
   table<-import_temp_files(file_name_csv, site, zone, loggerID)
    temp_data<-rbind(temp_data, table)
-   }
+}
+
+temp_data<-na.omit(temp_data)
 
 write.csv(temp_data, "temp_data.csv")
