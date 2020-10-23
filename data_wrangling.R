@@ -58,5 +58,6 @@ for(row in 1:nrow(metadata)){
 }
 
 temp_data<-na.omit(temp_data)
+temp_data<-data.frame(temp_data)
 
 write.csv(temp_data, "temp_data.csv")

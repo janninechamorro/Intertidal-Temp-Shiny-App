@@ -14,9 +14,8 @@ library(shinycssloaders)
 #############################################
 # Import location data
 
-setwd("~/Documents/GitHub/Intertidal-Temp-Shiny-App/")
 
-all_sites <- read.csv("~/Documents/GitHub/Intertidal-Temp-Shiny-App/InfoMicrosite_2016_mussel.csv")
+all_sites <- read.csv("~/Documents/GitHub/Shiny App 2020/InfoMicrosite_2016_mussel.csv")
 
 # Subset West Coast sites
 site_data = filter(all_sites, 
@@ -82,7 +81,7 @@ ui<-navbarPage("Intertidal temperature data along the Pacific Coast",
                         ),
                
 
-               #############################################
+#############################################
                # Methods page
                tabPanel("Methods", 
                       tags$div(
@@ -104,20 +103,14 @@ ui<-navbarPage("Intertidal temperature data along the Pacific Coast",
                                  height=350, width="70%",
                                  style="display: block; 
                                     margin-left: auto; 
-<<<<<<< HEAD
-                                    margin-right: auto;")), #this part of this centers the image
-
-               #############################################
-=======
                                     margin-right: auto;"), #this part of this centers the image
+                                   
                       tags$img(src='robomussel_3.jpg', 
                                  height=350, width="70%",
                                  style="display: block; 
                                     margin-left: auto; 
-                                    margin-right: auto;")),
-                        #some notes to check it is loading to git hub      
+                                    margin-right: auto;")),#this part of this centers the image,
                
->>>>>>> e8e2dfd68cef9edf86d593def03930020437f814
                # Single site page
                tabPanel("Explore a Site",
                         sidebarPanel(
@@ -135,7 +128,7 @@ ui<-navbarPage("Intertidal temperature data along the Pacific Coast",
                         )),
                
                
-               #############################################
+#############################################
                # I made replicate single site page to try an figure out how to plot the temp data. 
                # Once I figure it out we can combine it with the original page.
                tabPanel("Explore a Site",
@@ -176,10 +169,10 @@ server<-function(input, output, session) {
   # Create welcome page photo slideshow
   output$welcome_slideshow <- renderSlickR({
     images <- c( "IMG_2275.jpg", "IMG_5476.jpg", "Panorama12.jpg", 
-                "IMG_6126.jpg")
+                "IMG_6126.jpg"),
     slickR(
-      images,
-      slideId = "slideshow_images",
+     images,
+      #slideId = "slideshow_images",
       height = 350, width = "70%"
     )
   })
