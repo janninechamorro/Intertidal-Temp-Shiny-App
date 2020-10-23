@@ -111,13 +111,13 @@ ui<-navbarPage("Intertidal temperature data along the Pacific Coast",
                                  margin-left: auto; 
                                  margin-right: auto;")),#this part of this centers the image,
                
-               # Single site page -map
+               # Single site page
                tabPanel("Explore a Site",
                         sidebarPanel(
                           #Select which site to show on map
-                          selectInput("SiteFinder",
+                          selectInput("SiteSelect",
                                       label = "Choose a site!",
-                                      choices = c("Lompoc Landing, CA"="LL", "Alegria, CA"="AG", "Coal Oil Point, CA"="CP"))
+                                      choices = unique(unique_site_data$location))
                         ),
                         
                         mainPanel(
@@ -160,9 +160,8 @@ ui<-navbarPage("Intertidal temperature data along the Pacific Coast",
                                   withSpinner(plotOutput(outputId="scatterplotFinder"), color="#DCE2E3"))))
 
 
-            ###Map
 
-            
+
 
 #############################################
 server<-function(input, output, session) {
@@ -196,14 +195,14 @@ server<-function(input, output, session) {
   #leaflet(options = leafletOptions(minZoom = 4))
   
   output$map1 <- renderLeaflet({
-    leaflet( data=SBsites ) %>% 
+    leaflet( data=unique_site_data ) %>% 
       addProviderTiles(providers$Esri.WorldPhysical,
                        providerTileOptions(detectRetina = T)) %>%
       #) %>% 
       addMarkers(
-        lng = SBsites$field_lon,
-        lat = SBsites$field_lat,
-        label = SBsites$site_ab,
+        lng = unique_site_data$field_lon,
+        lat = unique_site_data$field_lat,
+        label = unique_site_data$location,
         group = "myMarkers",
         labelOptions = labelOptions(direction = "bottom",
                                     offset = c(2,2), sticky = T,
@@ -217,10 +216,10 @@ server<-function(input, output, session) {
                                     )),
         options = markerOptions(interactive = F, clickable = T, riseOnHover = F),
         #  #clusterOptions = markerClusterOptions(),
-        popup = paste(SBsites$location, ", ", 
-                      SBsites$state_province, "<br>",
-                      "(", SBsites$field_lat, "ºN, ", 
-                      SBsites$field_lon, " ºW)", sep = ""),
+        popup = paste(unique_site_data$location, ", ", 
+                      unique_site_data$state_province, "<br>",
+                      "(", unique_site_data$field_lat, "ºN, ", 
+                      unique_site_data$field_lon, " ºW)", sep = ""),
         popupOptions = popupOptions(maxWidth = 300, 
                                     minWidth = 50, maxHeight = NULL,
                                     autoPan = T, keepInView = F, closeButton = T)
@@ -235,11 +234,11 @@ server<-function(input, output, session) {
         onClick=JS("function(btn, map){ map.setZoom(1); }")))
   })
   
-  observeEvent(input$SiteFinder, {
+  observeEvent(input$SiteSelect, {
     leafletProxy("map1") %>% 
       clearGroup("myMarkers") %>% 
       addMarkers(
-        data = SBsites[SBsites$site_ab == input$SiteFinder, ],
+        data = unique_site_data[unique_site_data$location == input$SiteSelect, ],
         lng = ~field_lon,
         lat = ~field_lat,
         label = ~location,
