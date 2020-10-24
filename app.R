@@ -110,14 +110,7 @@ ui<-navbarPage("Intertidal temperature data along the Pacific Coast",
                                  style="display: block; 
                                  margin-left: auto; 
                                  margin-right: auto;")),#this part of this centers the image,
-               
-               # Single site page -map
-               tabPanel("Explore a Site",
-                        sidebarPanel(
-                          #Select which site to show on map
-                          selectInput("SiteFinder",
-                                      label = "Choose a site!",
-                                      choices = c("Lompoc Landing, CA"="LL", "Alegria, CA"="AG", "Coal Oil Point, CA"="CP")))),
+
                
                
                #############################################
@@ -145,15 +138,14 @@ ui<-navbarPage("Intertidal temperature data along the Pacific Coast",
                             min= as.Date(min(temp_data$local_datetime), format="%Y-%m-%d %h:%m:%s"),
                             max= as.Date(max(temp_data$local_datetime), format="%Y-%m-%d %h:%m:%s"),
                             timeFormat="%b %Y"),
-                        
-                            leafletOutput(outputId = "map1",
-                                        width = "60%",
+                          
+                          leafletOutput(outputId = "map1",
+                                        width = "80%",
                                         height = "400")),
-                      
-                             
-                         mainPanel("Let's plot some temperature data!", 
-                                 splitLayout(cellWidths=c("75%", "25%"),
-                                            withSpinner(plotOutput(outputId="scatterplotFinder"), color="#DCE2E3")))))
+                        
+                        
+                        mainPanel("Let's plot some temperature data!", 
+                                              withSpinner(plotOutput(outputId="scatterplotFinder"), color="#DCE2E3")))) #ithSpinner is the loading symbol
 
 
 #############################################
@@ -217,7 +209,7 @@ server<-function(input, output, session) {
                                     minWidth = 50, maxHeight = NULL,
                                     autoPan = T, keepInView = F, closeButton = T)
       ) %>% 
-      setView(lat = 42,	lng = -130, zoom = 4) %>% 
+      setView(lat = 42,	lng = -119, zoom = 4) %>% 
       #addMiniMap(
       #  tiles = providers$Esri.OceanBasemap,
       #  toggleDisplay = T
@@ -235,7 +227,7 @@ server<-function(input, output, session) {
         data = SBsites[SBsites$site_ab == input$SiteFinder, ],
         lng = ~field_lon,
         lat = ~field_lat,
-        label = ~location,
+        label = ~site_ab,
         group = "myMarkers",
         labelOptions = labelOptions(direction = "left",
                                     permanent = T,
