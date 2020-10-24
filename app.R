@@ -117,15 +117,7 @@ ui<-navbarPage("Intertidal temperature data along the Pacific Coast",
                           #Select which site to show on map
                           selectInput("SiteFinder",
                                       label = "Choose a site!",
-                                      choices = c("Lompoc Landing, CA"="LL", "Alegria, CA"="AG", "Coal Oil Point, CA"="CP"))
-                        ),
-                        
-                        mainPanel(
-                          "",
-                          leafletOutput(outputId = "map1",
-                                        width = "60%",
-                                        height = "400")
-                        )),
+                                      choices = c("Lompoc Landing, CA"="LL", "Alegria, CA"="AG", "Coal Oil Point, CA"="CP")))),
                
                
                #############################################
@@ -152,17 +144,17 @@ ui<-navbarPage("Intertidal temperature data along the Pacific Coast",
                             value= c(as.Date(min(temp_data$local_datetime), format="%Y-%m-%d %h:%m:%s"), as.Date(max(temp_data$local_datetime), format="%Y-%m-%d %h:%m:%s")),
                             min= as.Date(min(temp_data$local_datetime), format="%Y-%m-%d %h:%m:%s"),
                             max= as.Date(max(temp_data$local_datetime), format="%Y-%m-%d %h:%m:%s"),
-                            timeFormat="%b %Y")), 
-                        #Here is some text to determine if my stuff is getting pushed
-                        #here is a change 2
+                            timeFormat="%b %Y"),
                         
-                        mainPanel("", 
-                                  withSpinner(plotOutput(outputId="scatterplotFinder"), color="#DCE2E3"))))
+                            leafletOutput(outputId = "map1",
+                                        width = "60%",
+                                        height = "400")),
+                      
+                             
+                         mainPanel("Let's plot some temperature data!", 
+                                 splitLayout(cellWidths=c("75%", "25%"),
+                                            withSpinner(plotOutput(outputId="scatterplotFinder"), color="#DCE2E3")))))
 
-
-            ###Map
-
-            
 
 #############################################
 server<-function(input, output, session) {
@@ -234,6 +226,7 @@ server<-function(input, output, session) {
         icon="fa-globe", title="Zoom out to level 1",
         onClick=JS("function(btn, map){ map.setZoom(1); }")))
   })
+  
   
   observeEvent(input$SiteFinder, {
     leafletProxy("map1") %>% 
