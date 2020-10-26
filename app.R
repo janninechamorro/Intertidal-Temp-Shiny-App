@@ -9,6 +9,7 @@ library(slickR)
 library(here)
 library(leaflet)
 library(shinycssloaders)
+library(RColorBrewer)
 
 
 #############################################
@@ -30,7 +31,9 @@ unique_site_data <- distinct(site_data, location, .keep_all = TRUE)
 #temp_data<-read_csv(file="temp_data.csv")
 
 #############################################
-ui<-navbarPage("Intertidal temperature data along the Pacific Coast",
+ui<-shiny::navbarPage(title=div(img(src="Transparent Mussels.png", 
+                                    style="margin-top: -14px; padding-right:10px;
+                                    padding-bottom:10px", height=60)),
                theme = shinytheme("flatly"),
                
                #############################################
@@ -84,33 +87,42 @@ ui<-navbarPage("Intertidal temperature data along the Pacific Coast",
                #############################################
                # Methods page
                tabPanel("Methods", 
-                        tags$div(
-                          h2("How is this data collected?"),
+                       
+                         h2("How is this data collected?"),
                           p("Temperature data is collected using biomimetic temperature
                             loggers called Robomussels. Robomussels are different from other 
                             temperature loggers because they thermally match living mussels, 
                             meaning they are similar in size, color, shape and thermal inertia. 
                             Using Robomussels allows us to more accurately measure 
                             temperature experienced by mussels. Robomussels specifically used in 
-                            this dataset were designed to mimic once of the most abundant mussel
+                            this dataset were designed to mimic one of the most abundant mussel
                             species found along the northeastern Pacific coast, California mussels",
                             em("(Mytilus californianus)."),
                             "Multiple Robomussels are installed at each site, 
                             they are placed at different heights in the mussel bed 
                             to measure the wide range of temperatures 
-                            experienced by mussels in the intertidal zone.")),
-                        tags$img(src='robo_mussel_comp.jpg', 
-                                 height=350, width="70%",
-                                 style="display: block; 
-                                 margin-left: auto; 
-                                 margin-right: auto;"), #this part of this centers the image
+                            experienced by mussels in the intertidal zone."),
+                        br(),
+                        img(src='robomussel_comp.jpg', 
+                                 height="33.3%", width="50%", align="left"), 
+                      
+                        img(src='robomussel_1.jpg', 
+                                 height="38%", width="50%", align="right"),
+                        p(em("Image 1. Side by side comparison of a Robomussel and a California mussel.
+                          Image 2. Robomussel in a mussel bed."), align="left"),
                         
-                        tags$img(src='robomussel_3.jpg', 
-                                 height=350, width="70%",
-                                 style="display: block; 
-                                 margin-left: auto; 
-                                 margin-right: auto;")),#this part of this centers the image,
-
+                        br(),
+                          h2("Why is monitoring temperature in the intertidal zone so important?"),
+                          p("The rocky intertidal zone is an ecosystem with very high biodiversity, 
+                          meaning lots of different species of animals and algae live here. 
+                          California mussels are an important part of maintaining this biodiversity 
+                          since they are ecosystem engineers, creating habitat for small animals. 
+                          Monitoring temperature in mussel beds allow us to learn about what temperature 
+                          conditions mussels are accustomed to. Also, monitoring temperature over long 
+                          periods of time allows us to understand how intertidal zone 
+                          temperatures change over different timescales."),
+                        br()),
+  
                
                
                #############################################
@@ -283,7 +295,7 @@ server<-function(input, output, session) {
   
   #Filtering Data to Plot
   Intertidal_Finder<-reactive({
-    validate(need(input$ZoneFinder, "Please select from the dataset."))
+    validate(need(input$ZoneFinder, "Please select from the dataset on the left."))
     
     temp_data %>% 
       filter(site==input$SiteFinder) %>% #Filter out site of interest
@@ -297,11 +309,12 @@ server<-function(input, output, session) {
   output$scatterplotFinder<- renderPlot({
     
     ggplot(data=Intertidal_Finder(), aes(x=local_datetime, y=Temp_C, color=zone))+
-      geom_point(size=0.2, alpha=0.5)+
+      geom_point(size=0.2, alpha=0.25)+
       xlab("Date")+
       ylab("Temperature (C)")+
       labs(color="Zone")+
-      theme_minimal(base_size=20)
+      guides(colour = guide_legend(override.aes = list(size=5)))+
+      theme_bw(base_size=20)
     
   })
   
