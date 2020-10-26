@@ -123,7 +123,7 @@ ui<-shiny::navbarPage(title=div(img(src="Transparent Mussels.png",
                           temperatures change over different timescales."),
                         br()),
   
-               
+               # small change to tryin and figure out pulling on Cristina's end
                
                #############################################
                # I made replicate single site page to try an figure out how to plot the temp data. 
