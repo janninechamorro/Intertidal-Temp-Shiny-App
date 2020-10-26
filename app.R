@@ -221,7 +221,7 @@ server<-function(input, output, session) {
                                     minWidth = 50, maxHeight = NULL,
                                     autoPan = T, keepInView = F, closeButton = T)
       ) %>% 
-      setView(lat = 42,	lng = -119, zoom = 4) %>% 
+      setView(lat = 34.5,	lng = -120, zoom = 6) %>% 
       #addMiniMap(
       #  tiles = providers$Esri.OceanBasemap,
       #  toggleDisplay = T
