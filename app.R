@@ -10,6 +10,7 @@ library(here)
 library(leaflet)
 library(shinycssloaders)
 library(RColorBrewer)
+library(gridExtra)
 
 
 #############################################
@@ -44,22 +45,26 @@ ui<-shiny::navbarPage(title=div(img(src="Transparent Mussels.png",
                            align = "left",
                            style = "margin: 15px 40px;"),
                         
-                        tags$div(
-                          slickROutput("welcome_slideshow", 
-                                       height = "350px", 
-                                       width = "500px"),
-                          style = "float:left; 
-                          margin: 0px 40px 15px 40px;
-                          border: 1px solid gray;"),
+                        #tags$div(
+                        tags$img(src='IMG_2275.jpg', height="350px", align="left",
+                                 style = "float:left;
+                                 margin: 0px 40px 15px 40px;
+                                 border: 1px solid gray;"),
+                          #slickROutput("welcome_slideshow", 
+                          #             height = "350px", 
+                          #             width = "500px"),
+                          #style = "float:left; 
+                          #margin: 0px 40px 15px 40px;
+                          #border: 1px solid gray;"),
                         
                         tags$div(
                           h4("This app allows you to visualize intertidal
-                             temperature data collected along the northeastern Pacific Coast.
+                             temperature data collected along the coast of the Northeastern Pacific Ocean
                              Explore the app using the navigation bar above."),
                           h1(),
                           h3("Check out our collaborators:"),
                           a("Helmuth Lab at Northeastern University",
-                            href="http://www.northeastern.edu/helmuthlab/about.html"),
+                            href="https://helmuthlab.cos.northeastern.edu/"),
                           p(),
                           a("PISCO (Partnership for Interdisciplinary Studies of 
                             Coastal Oceans)",
@@ -87,8 +92,8 @@ ui<-shiny::navbarPage(title=div(img(src="Transparent Mussels.png",
                #############################################
                # Methods page
                tabPanel("Methods", 
-                       
-                         h2("How is this data collected?"),
+                        fluidRow(
+                          h2("How is this data collected?"),
                           p("Temperature data is collected using biomimetic temperature
                             loggers called Robomussels. Robomussels are different from other 
                             temperature loggers because they thermally match living mussels, 
@@ -98,21 +103,37 @@ ui<-shiny::navbarPage(title=div(img(src="Transparent Mussels.png",
                             this dataset were designed to mimic one of the most abundant mussel
                             species found along the northeastern Pacific coast, California mussels",
                             em("(Mytilus californianus)."),
-                            "Multiple Robomussels are installed at each site, 
+                                   "Multiple Robomussels are installed at each site, 
                             they are placed at different heights in the mussel bed 
                             to measure the wide range of temperatures 
                             experienced by mussels in the intertidal zone."),
-                        br(),
-                        img(src='robomussel_comp.jpg', 
-                                 height="33.3%", width="50%", align="left"), 
-                      
-                        img(src='robomussel_1.jpg', 
-                                 height="38%", width="50%", align="right"),
-                        p(em("Image 1. Side by side comparison of a Robomussel and a California mussel.
-                          Image 2. Robomussel in a mussel bed."), align="left"),
+                          br(),
+                          ),
                         
-                        br(),
-                          h2("Why is monitoring temperature in the intertidal zone so important?"),
+                        tags$div(
+                          fluidRow(
+                            column(6, tags$img(
+                              src="robomussel_comp.jpg", height="300px", align="left",
+                              style = "float:left; padding: 0px 15px 0px 0px;")),
+                            column(6, tags$img(
+                              src="robomussel_1.jpg", height="300px", align="right",
+                              style = "float:left; padding: 0px 15px 0px 15px;"))
+                        )
+                        ),
+                        
+                        tags$div(
+                          fluidRow(
+                            column(6, tags$text(p(em(
+                              "Image 1. Side-by-side comparison of a Robomussel and a California mussel.")),
+                              style = "text-align:center; padding:0px 5px 0px 5px;")),
+                            column(6, tags$text(p(em(
+                              "Image 2. Robomussel in a mussel bed.")),
+                              style = "text-align:center; padding:0px 5px 0px 05px;"))
+                          )
+                        ),
+                        
+                        tags$div(
+                          h2("Why is monitoring temperature in the intertidal zone important?"),
                           p("The rocky intertidal zone is an ecosystem with very high biodiversity, 
                           meaning lots of different species of animals and algae live here. 
                           California mussels are an important part of maintaining this biodiversity 
@@ -121,9 +142,11 @@ ui<-shiny::navbarPage(title=div(img(src="Transparent Mussels.png",
                           conditions mussels are accustomed to. Also, monitoring temperature over long 
                           periods of time allows us to understand how intertidal zone 
                           temperatures change over different timescales."),
-                        br()),
-  
-               # small change to tryin and figure out pulling on Cristina's end
+                          br()), style = "float; padding:20px"
+                        
+               ),
+
+
                
                #############################################
                # I made replicate single site page to try an figure out how to plot the temp data. 
@@ -162,17 +185,19 @@ ui<-shiny::navbarPage(title=div(img(src="Transparent Mussels.png",
 
 #############################################
 server<-function(input, output, session) {
+
   
   # Create welcome page photo slideshow
-  output$welcome_slideshow <- renderSlickR({
-    images <- c( "IMG_2275.jpg", "IMG_5476.jpg", "Panorama12.jpg", 
-                 "IMG_6126.jpg")
-    slickR(
-      images,
+
+  #output$welcome_slideshow <- renderSlickR({
+  #  images <- c( "IMG_2275.jpg", "IMG_5476.jpg", "Panorama12.jpg", 
+  #               "IMG_6126.jpg")
+  #  slickR(
+  #    images,
       #slideId = "slideshow_images",
-      height = 350, width = "70%"
-    )
-  })
+  #    height = 350, width = "70%"
+  #  )
+  #})
   
   # Create reactive site dataframe
   #locations <- reactive({
