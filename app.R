@@ -94,19 +94,21 @@ ui<-shiny::navbarPage(title=div(img(src="Transparent Mussels.png",
                tabPanel("Methods", 
                         fluidRow(
                           h2("How is this data collected?"),
-                          p("Temperature data is collected using biomimetic temperature
-                            loggers called Robomussels. Robomussels are different from other 
-                            temperature loggers because they thermally match living mussels, 
-                            meaning they are similar in size, color, shape and thermal inertia. 
-                            Using Robomussels allows us to more accurately measure 
-                            temperature experienced by mussels. Robomussels specifically used in 
+                          p("We are visualizing temperature data collected using biomimetic
+                            temperature loggers called Robomussels. Robomussels are different from
+                            other temperature loggers because they thermally match living mussels, 
+                            meaning they are similar in size, color, shape, and thermal inertia
+                            to living mussels. Using Robomussels rather than traditional
+                            temperature loggers allows us to more accurately measure the
+                            temperatures that mussels experience. The Robomussels specifically used in 
                             this dataset were designed to mimic one of the most abundant mussel
                             species found along the northeastern Pacific coast, California mussels",
-                            em("(Mytilus californianus)."),
-                                   "Multiple Robomussels are installed at each site, 
-                            they are placed at different heights in the mussel bed 
-                            to measure the wide range of temperatures 
-                            experienced by mussels in the intertidal zone."),
+                            em("(Mytilus californianus).")),
+                          br(),
+                          p("Multiple Robomussels are installed at each site. 
+                            They are placed at different heights in the mussel bed to
+                            measure the wide range of temperatures experienced by mussels
+                            in the different zones of the rocky intertidal ecosystem."),
                           br(),
                           ),
                         
