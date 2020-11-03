@@ -165,8 +165,7 @@ server<-function(input, output, session) {
   
   # Create welcome page photo slideshow
   output$welcome_slideshow <- renderSlickR({
-    images <- c( "IMG_2275.jpg", "IMG_5476.jpg", "Panorama12.jpg", 
-                 "IMG_6126.jpg")
+    images <- c( "IMG_2275.jpg", "IMG_5476.jpg", "Panorama12.jpg", "IMG_6126.jpg")
     slickR(
       images,
       #slideId = "slideshow_images",
