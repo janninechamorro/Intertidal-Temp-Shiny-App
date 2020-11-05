@@ -11,13 +11,15 @@ library(leaflet)
 library(shinycssloaders)
 library(RColorBrewer)
 library(gridExtra)
+library(rsconnect)
+
 
 
 #############################################
 # Import location data
 
 
-all_sites <- read.csv("~/Documents/GitHub/Shiny App 2020/InfoMicrosite_2016_mussel.csv")
+all_sites <- read.csv("InfoMicrosite_2016_mussel.csv")
 
 # Subset West Coast sites
 site_data = filter(all_sites, 
@@ -28,8 +30,15 @@ site_data = filter(all_sites,
 # Subset unique West Coast sites
 unique_site_data <- distinct(site_data, location, .keep_all = TRUE)
 
+### Doing some more flitering of just SB sites, to try something
+SBsites<-all_sites %>% 
+  filter(location %in% c("Lompoc Landing", "Coal Oil Point", "Alegria")) %>% 
+  mutate(site_ab=substr(microsite_id, 9,10))
+
 # All temp data from "data_wrangling.R"
-#temp_data<-read_csv(file="temp_data.csv")
+temp_data<-read_csv("temp_data.csv") %>% 
+   mutate(local_datetime=as.POSIXct(local_datetime, "%m/%d/%Y %H:%M:%S", tz="America/Los_Angeles"))
+  
 
 #############################################
 ui<-shiny::navbarPage(title=div(img(src="Transparent Mussels.png", 
@@ -41,7 +50,7 @@ ui<-shiny::navbarPage(title=div(img(src="Transparent Mussels.png",
                # Welcome page
                tabPanel("Home",
                         
-                        h1("Welcome!", 
+                       fluidRow( h1("Welcome!", 
                            align = "left",
                            style = "margin: 15px 40px;"),
                         
@@ -71,12 +80,22 @@ ui<-shiny::navbarPage(title=div(img(src="Transparent Mussels.png",
                             href="http://www.piscoweb.org/"),
                           p(),
                           a("MARINe (Multi-Agency Rocky Intertidal Network)",
-                            href="https://marine.ucsc.edu/index.html"),
-                          style = "margin: 0px 40px;"
+                            href="https://marine.ucsc.edu/index.html"),  style = "margin: 40px 40px;",
+                          br(),
+                          br(),
+                          br(),
+                          br(),
+                          br(),
+                          br()),
+                        tags$div(
+                          p("Have any questions about the app? Please reach out the creators:", 
+                            a("J. Chamorro", href="mailto:jdchamorro@ucsb.edu", style= "color:teal"), "&", 
+                            a("C. Dobbelaere", href="mailto:cdobbelaere@ucsb.edu", style= "color:teal"), align="center"),
+                          style = "margin: 40px 40px;"
                         ),
                         
                         tags$footer(
-                          h6("Photos by Jannine Chamorro"),
+                          h6("Photos by Dasun Hemachandra"),
                           style = "position:absolute;
                           float:center;
                           bottom:40px;
@@ -86,7 +105,7 @@ ui<-shiny::navbarPage(title=div(img(src="Transparent Mussels.png",
                           font-style:italic;
                           padding:40px 40px;
                           z-index:1;")
-                        ),
+                        )),
                
                
                #############################################
@@ -103,13 +122,11 @@ ui<-shiny::navbarPage(title=div(img(src="Transparent Mussels.png",
                             temperatures that mussels experience. The Robomussels specifically used in 
                             this dataset were designed to mimic one of the most abundant mussel
                             species found along the northeastern Pacific coast, California mussels",
-                            em("(Mytilus californianus).")),
-                          br(),
-                          p("Multiple Robomussels are installed at each site. 
+                           em("(Mytilus californianus)."), "Multiple Robomussels are installed at each site. 
                             They are placed at different heights in the mussel bed to
-                            measure the wide range of temperatures experienced by mussels
-                            in the different zones of the rocky intertidal ecosystem."),
-                          br(),
+                               measure the wide range of temperatures experienced by mussels
+                               in the different zones of the rocky intertidal ecosystem."),
+                          br()
                           ),
                         
                         tags$div(
@@ -125,12 +142,12 @@ ui<-shiny::navbarPage(title=div(img(src="Transparent Mussels.png",
                         
                         tags$div(
                           fluidRow(
-                            column(6, tags$text(p(em(
+                            column(6, tags$p(em(
                               "Image 1. Side-by-side comparison of a Robomussel and a California mussel.")),
-                              style = "text-align:center; padding:0px 5px 0px 5px;")),
-                            column(6, tags$text(p(em(
+                              style = "text-align:center; padding:0px 5px 0px 5px;"),
+                            column(6, tags$p(em(
                               "Image 2. Robomussel in a mussel bed.")),
-                              style = "text-align:center; padding:0px 5px 0px 05px;"))
+                              style = "text-align:center; padding:0px 5px 0px 05px;")
                           )
                         ),
                         
@@ -145,8 +162,7 @@ ui<-shiny::navbarPage(title=div(img(src="Transparent Mussels.png",
                           periods of time allows us to understand how intertidal zone 
                           temperatures change over different timescales."),
                           br()), style = "float; padding:20px"
-                        
-               ),
+                         ),
 
 
                
@@ -171,7 +187,8 @@ ui<-shiny::navbarPage(title=div(img(src="Transparent Mussels.png",
                           sliderInput(
                             inputId = "dateFinder",
                             label = "Date",
-                            value= c(as.Date(min(temp_data$local_datetime), format="%Y-%m-%d %h:%m:%s"), as.Date(max(temp_data$local_datetime), format="%Y-%m-%d %h:%m:%s")),
+                            value= c(as.Date(min(temp_data$local_datetime), format="%Y-%m-%d %h:%m:%s"), 
+                                     as.Date(max(temp_data$local_datetime), format="%Y-%m-%d %h:%m:%s")),
                             min= as.Date(min(temp_data$local_datetime), format="%Y-%m-%d %h:%m:%s"),
                             max= as.Date(max(temp_data$local_datetime), format="%Y-%m-%d %h:%m:%s"),
                             timeFormat="%b %Y"),
@@ -190,19 +207,18 @@ server<-function(input, output, session) {
 
   
   # Create welcome page photo slideshow
-<<<<<<< HEAD
   output$welcome_slideshow <- renderSlickR({
     images <- c( "IMG_2275.jpg", "IMG_5476.jpg", "Panorama12.jpg", "IMG_6126.jpg")
     slickR(
       images,
-=======
+      lideId = "slideshow_images",
+      height = 350, width = "70%")})
 
   #output$welcome_slideshow <- renderSlickR({
   #  images <- c( "IMG_2275.jpg", "IMG_5476.jpg", "Panorama12.jpg", 
   #               "IMG_6126.jpg")
   #  slickR(
   #    images,
->>>>>>> 503c32e7609e00821561e7071d35cd6ea831c06e
       #slideId = "slideshow_images",
   #    height = 350, width = "70%"
   #  )
@@ -349,11 +365,7 @@ server<-function(input, output, session) {
       labs(color="Zone")+
       guides(colour = guide_legend(override.aes = list(size=5)))+
       theme_bw(base_size=20)
-    
   })
-  
-  
-  
 }
 
 shinyApp(ui = ui, server = server)
